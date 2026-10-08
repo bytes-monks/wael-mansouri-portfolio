@@ -3,8 +3,20 @@
  * "where it runs" lives here, so a domain or inbox change is a one-file edit.
  */
 
-/** Canonical origin, no trailing slash. Must match public/CNAME. */
-export const SITE_URL = 'https://waelmansouri.com';
+/** Where the site lives once the custom domain is live. */
+export const DEFAULT_SITE_URL = 'https://waelmansouri.com';
+
+/**
+ * Canonical URL of the site root, no trailing slash. The deploy workflow sets
+ * VITE_SITE_URL to the address GitHub Pages actually serves — today
+ * https://bytes-monks.github.io/wael-mansouri-portfolio, and
+ * https://waelmansouri.com once that custom domain is configured — together
+ * with BASE_URL (the path part). Local builds fall back to the custom domain.
+ */
+// Always https: the Pages API reports http:// until "Enforce HTTPS" is ticked.
+export const SITE_URL = (import.meta.env.VITE_SITE_URL || DEFAULT_SITE_URL)
+  .replace(/^http:\/\//, 'https://')
+  .replace(/\/+$/, '');
 
 /**
  * WhatsApp number, digits only with country code (e.g. 21612345678).

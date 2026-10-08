@@ -42,7 +42,7 @@ const FORM_TYPE = 'wael-mansouri-inquiry';
 const siteTs = fs.readFileSync(path.join(ROOT, 'src/lib/site.ts'), 'utf8');
 const FORM_ENDPOINT =
   process.env.VITE_FORM_ENDPOINT || siteTs.match(/FORM_ENDPOINT\s*=.*?\|\|\s*'([^']+)'/)?.[1];
-const SITE_URL = siteTs.match(/SITE_URL\s*=\s*'([^']+)'/)?.[1];
+const SITE_URL = (process.env.VITE_SITE_URL || siteTs.match(/DEFAULT_SITE_URL\s*=\s*'([^']+)'/)?.[1])?.replace(/\/+$/, '');
 if (!FORM_ENDPOINT || !SITE_URL) throw new Error('could not read FORM_ENDPOINT / SITE_URL from src/lib/site.ts');
 const FORM_HOST = new URL(FORM_ENDPOINT).hostname;
 

@@ -7,7 +7,12 @@
 //      <!--head-->, from the same data the page renders.
 //   3. Writes dist/sitemap.xml and dist/robots.txt from the same origin. <lastmod> is the date of the last commit, so
 //      the deploy workflow checks out with fetch-depth: 0.
-//   4. Fails the build if dist/CNAME disagrees with the canonical origin.
+//   4. Fills the deploy base into dist/404.html, and writes dist/CNAME when
+//      the site is on a custom domain (informational: Actions-based Pages
+//      deploys take the domain from Settings -> Pages, not from this file).
+//   5. Fails the build if BASE_URL is not the path of SITE_URL, or if any
+//      root-absolute URL in the output escapes the base — the bug that breaks
+//      every asset on a github.io project URL.
 import { execFileSync } from 'node:child_process';
 import { readFile, writeFile } from 'node:fs/promises';
 import path from 'node:path';
@@ -71,8 +76,27 @@ Sitemap: ${origin}/sitemap.xml
 `,
 );
 
-const cname = (await readFile(path.join(DIST, 'CNAME'), 'utf8').catch(() => '')).trim();
-const host = new URL(origin).host;
-if (cname !== host) fail(`dist/CNAME is "${cname}" but SITE_URL host is "${host}" — they must match`);
+const BASE = (process.env.BASE_URL || '/').replace(/\/{2,}/g, '/');
+const site = new URL(`${origin}/`);
+if (site.pathname !== BASE) fail(`BASE_URL is "${BASE}" but SITE_URL ${origin} has path "${site.pathname}" — they must match`);
 
-console.log(`prerender: index.html (${(body.length / 1024).toFixed(1)} KB body), sitemap.xml (lastmod ${lastmod}), robots.txt, ${preloads.length ? 'hoisted image preload' : 'no preload'}, CNAME ${cname}`);
+const notFoundPath = path.join(DIST, '404.html');
+await writeFile(notFoundPath, (await readFile(notFoundPath, 'utf8')).replaceAll('%BASE%', BASE));
+
+const customDomain = !site.host.endsWith('.github.io');
+if (customDomain) await writeFile(path.join(DIST, 'CNAME'), `${site.host}\n`);
+
+if (BASE !== '/') {
+  for (const file of ['index.html', '404.html']) {
+    const text = await readFile(path.join(DIST, file), 'utf8');
+    const urls = [...text.matchAll(/(?:href|src|content)="(\/[^"]*)"|(?:srcset|imagesrcset)="([^"]*)"/gi)]
+      .flatMap((m) => (m[1] ? [m[1]] : m[2].split(',').map((c) => c.trim().split(/\s+/)[0])))
+      .filter((u) => u.startsWith('/') && !u.startsWith('//') && !u.startsWith(BASE));
+    if (urls.length) fail(`${file} has ${urls.length} URL(s) outside base ${BASE}, e.g. ${urls.slice(0, 3).join(', ')}`);
+  }
+}
+
+console.log(
+  `prerender: ${origin}/ (base ${BASE}) — index.html (${(body.length / 1024).toFixed(1)} KB body), sitemap.xml (lastmod ${lastmod}), robots.txt, 404.html, ` +
+    `${customDomain ? `CNAME ${site.host}` : 'no CNAME (github.io)'}, ${preloads.length ? 'hoisted image preload' : 'no preload'}`,
+);

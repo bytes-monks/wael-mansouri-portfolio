@@ -2,7 +2,8 @@
 
 Editorial one-page site for vacation, honeymoon, maternity and couple photography across Tunisia.
 Built with **React 19**, **Vite 5**, **Tailwind CSS 3** and TypeScript, prerendered to static HTML and
-hosted on **GitHub Pages** at **https://waelmansouri.com** (with `waelmansouri.bytesmonks.com` redirecting there).
+hosted on **GitHub Pages**: live now at **https://bytes-monks.github.io/wael-mansouri-portfolio/**, and at
+**https://waelmansouri.com** once that custom domain is set (with `waelmansouri.bytesmonks.com` redirecting there).
 
 ## Run it locally
 
@@ -25,7 +26,7 @@ npm run build && npm run preview   # the exact production output
 4. `vite build --ssr` — server render bundle into `.ssr/`.
 5. `scripts/prerender.mjs` — renders the page into `dist/index.html` (so it works without JavaScript and is
    fully crawlable), injects the title/description/Open Graph tags, writes `sitemap.xml`, and fails if
-   `public/CNAME` does not match `SITE_URL`.
+   any asset URL escapes the deploy base path.
 
 The result in `dist/` is plain static files: no server, no API routes.
 
@@ -44,7 +45,7 @@ and DNS setup for both domains.
 
 | Setting | Where |
 |---|---|
-| Canonical domain | `SITE_URL` in `src/lib/site.ts` **and** `public/CNAME` (the build checks they agree) |
+| Live address | Automatic: the deploy builds for whatever GitHub Pages serves, the github.io URL now and `waelmansouri.com` once set as the custom domain (see DEPLOYMENT.md). Local fallback: `DEFAULT_SITE_URL` in `src/lib/site.ts` |
 | WhatsApp number | GitHub repository variable `VITE_WHATSAPP` (digits only, e.g. `21612345678`) |
 | Inquiry form destination | GitHub repository variable `VITE_FORM_ENDPOINT`; default in `src/lib/site.ts` |
 

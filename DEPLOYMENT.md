@@ -3,7 +3,8 @@
 | | |
 |---|---|
 | Host | GitHub Pages, built by GitHub Actions |
-| Canonical URL | **https://waelmansouri.com** |
+| Canonical URL | **https://waelmansouri.com** once the custom domain is set |
+| Live now | **https://bytes-monks.github.io/wael-mansouri-portfolio/**, the default Pages address. Once the custom domain is set, GitHub redirects it to `waelmansouri.com`, keeping the path |
 | Also answers | `www.waelmansouri.com` (GitHub redirects it to the apex automatically) |
 | Redirects to it | `waelmansouri.bytesmonks.com` (see [`deploy/subdomain-redirect/`](deploy/subdomain-redirect/README.md)) |
 | Repository | `bytes-monks/wael-mansouri-portfolio`, next to `bytes-monks/bytes-monks` and `bytes-monks/china-sourcing` |
@@ -11,13 +12,10 @@
 ## 0. Register waelmansouri.com first
 
 As of 2026-10-08 **`waelmansouri.com` is not registered** (the .com registry returns 404 and DNS returns NXDOMAIN).
-Register it before the first deploy. Until then the deploy still works, but the custom domain will not resolve, and
-anyone could register the name the site's canonical links point to.
-
-If the site has to go live before the domain is bought, temporarily serve it on the subdomain instead: set `SITE_URL`
-to `https://waelmansouri.bytesmonks.com` and `public/CNAME` to `waelmansouri.bytesmonks.com`, then add
-`waelmansouri  CNAME  bytes-monks.github.io.` (**DNS only**) in Cloudflare. Switch both back once the apex is live and
-set up the redirect in step 4.
+Nothing is blocked meanwhile: until a custom domain is set in **Settings → Pages**, every deploy builds for, and is
+served at, **https://bytes-monks.github.io/wael-mansouri-portfolio/**. Do not set the custom domain in step 2.4 until
+the domain is registered and its DNS (step 3) is in place, or the site will redirect to an address that does not
+resolve.
 
 ## 1. Push the code
 
@@ -39,9 +37,13 @@ In the repository:
    - `VITE_FORM_ENDPOINT` (optional) = a form collector URL that delivers to Wael's inbox. If unset, the form uses
      the shared formgrid.dev collector in `src/lib/site.ts` (the Bytes Monks one), tagged
      `formType: "wael-mansouri-inquiry"`.
-3. Re-run **Actions → Deploy to GitHub Pages** (or push again).
-4. **Settings → Pages → Custom domain: `waelmansouri.com`** → Save. Once the DNS check passes and the certificate is
-   issued (minutes to an hour), tick **Enforce HTTPS**.
+3. Re-run **Actions → Deploy to GitHub Pages** (or push again). The site is now live at
+   https://bytes-monks.github.io/wael-mansouri-portfolio/.
+4. Once waelmansouri.com is registered and has the DNS from step 3: **Settings → Pages → Custom domain:
+   `waelmansouri.com`** → Save. When the DNS check passes and the certificate is issued (minutes to an hour), tick
+   **Enforce HTTPS**.
+5. **Re-run Actions → Deploy to GitHub Pages.** Saving a domain does not trigger a build, and the build is what
+   writes the canonical links, sitemap and asset paths for the new address (see below).
 
 Recommended: verify the domain for the organisation (**Org settings → Pages → Add a domain**) so no other GitHub
 account can claim it. GitHub gives a `TXT _github-pages-challenge-bytes-monks.waelmansouri.com` record to add.
@@ -83,5 +85,15 @@ Deploys queue rather than cancel each other, so a half-finished deploy never lea
 
 ## Changing the domain later
 
-Edit `SITE_URL` in `src/lib/site.ts`, `public/CNAME` (robots.txt and sitemap.xml follow automatically), and the Pages
-custom-domain setting. The build fails if `SITE_URL` and `public/CNAME` disagree.
+Nothing in the code names the live address. The deploy workflow asks GitHub Pages where the site is served
+(`actions/configure-pages` outputs `base_url` and `base_path`) and builds for exactly that:
+
+| Pages custom domain | `VITE_SITE_URL` | `BASE_URL` |
+|---|---|---|
+| none | `https://bytes-monks.github.io/wael-mansouri-portfolio` | `/wael-mansouri-portfolio/` |
+| `waelmansouri.com` | `https://waelmansouri.com` | `/` |
+
+So changing the domain is: change it in **Settings → Pages**, then re-run the deploy. Canonical links, Open Graph
+URLs, JSON-LD, `sitemap.xml`, `robots.txt`, `404.html` and every asset path follow. `DEFAULT_SITE_URL` in
+`src/lib/site.ts` is only the fallback for local builds. CI also builds the github.io variant on every pull request,
+and the build fails if any URL would escape the subpath.

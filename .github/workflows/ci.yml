@@ -45,6 +45,15 @@ jobs:
         env:
           BASE_URL: /
 
+      # The same build as served at https://bytes-monks.github.io/wael-mansouri-portfolio/
+      # before the custom domain is set. prerender fails if any URL in the
+      # output escapes the subpath, which would 404 every asset there.
+      - name: Build (github.io project path)
+        run: npm run build
+        env:
+          BASE_URL: /wael-mansouri-portfolio/
+          VITE_SITE_URL: https://bytes-monks.github.io/wael-mansouri-portfolio
+
   hydration:
     name: Prerendered HTML hydrates and behaves
     runs-on: ubuntu-latest

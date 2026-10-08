@@ -38,24 +38,30 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # Runs before the build because its outputs ARE the build's address:
+      # with no custom domain set, base_url is
+      #   https://bytes-monks.github.io/wael-mansouri-portfolio  (base_path /wael-mansouri-portfolio)
+      # and once Settings -> Pages -> Custom domain is waelmansouri.com,
+      #   https://waelmansouri.com                              (base_path empty)
+      # Changing the domain does not trigger a deploy: re-run this workflow so
+      # canonical links, the sitemap and asset paths follow.
+      - name: Setup Pages
+        id: pages
+        uses: actions/configure-pages@v6
+
       # `npm run build` = images -> tsc -> vite build -> vite build --ssr ->
       # prerender. Any stage failing aborts the deploy. prerender also fails
-      # if public/CNAME and SITE_URL (src/lib/site.ts) disagree.
+      # if any asset URL escapes BASE_URL.
       - name: Build
         run: npm run build
         env:
-          # '/' because the site is served from the custom domain root.
-          BASE_URL: /
+          VITE_SITE_URL: ${{ steps.pages.outputs.base_url }}
+          BASE_URL: ${{ steps.pages.outputs.base_path }}/
           # Repository variables (Settings -> Secrets and variables -> Actions
           # -> Variables). Both are public by nature — they end up in the
           # shipped JavaScript — so they are variables, not secrets.
           VITE_WHATSAPP: ${{ vars.VITE_WHATSAPP }}
           VITE_FORM_ENDPOINT: ${{ vars.VITE_FORM_ENDPOINT }}
-
-      # The custom domain reaches dist/ through public/CNAME, which Vite copies
-      # verbatim. Set the same domain in Settings -> Pages -> Custom domain.
-      - name: Setup Pages
-        uses: actions/configure-pages@v6
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v5

@@ -28,6 +28,7 @@ export default defineConfig(({ isSsrBuild }) => ({
           },
         },
   },
-  // '/' for the custom domain. Must agree with SITE_URL in src/lib/site.ts.
-  base: process.env.BASE_URL || '/',
+  // '/' for the custom domain, '/wael-mansouri-portfolio/' for the github.io
+  // project URL. Must be the path part of VITE_SITE_URL (prerender checks).
+  base: (process.env.BASE_URL || '/').replace(/\/{2,}/g, '/'),
 }));

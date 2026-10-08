@@ -6,9 +6,10 @@
     <title>Page not found | Wael Mansouri</title>
     <meta name="robots" content="noindex, follow" />
     <meta name="theme-color" content="#FAF8F5" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/svg+xml" href="%BASE%favicon.svg" />
     <style>
       /* Standalone: GitHub Pages serves this file as-is, without the app bundle.
+         %BASE% is replaced with the deploy base by scripts/prerender.mjs.
          Colours are the tokens from tailwind.config.ts. */
       * { box-sizing: border-box; margin: 0; padding: 0; }
       body {
@@ -34,7 +35,7 @@
       <p class="eyebrow">Wael Mansouri · Photography</p>
       <h1>This frame <em>is empty</em></h1>
       <p>The page you were looking for has moved or never existed. The portfolio, destinations and booking are all on the home page.</p>
-      <a href="/">Back to the home page</a>
+      <a href="%BASE%">Back to the home page</a>
     </main>
   </body>
 </html>
