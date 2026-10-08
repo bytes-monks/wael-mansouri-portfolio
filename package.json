@@ -1,0 +1,43 @@
+{
+  "name": "wael-mansouri-site",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "license": "UNLICENSED",
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "images": "node scripts/images.mjs",
+    "predev": "npm run images",
+    "dev": "vite",
+    "pretypecheck": "npm run images",
+    "typecheck": "tsc && tsc -p tsconfig.node.json --noEmit",
+    "prebuild": "npm run images",
+    "build": "tsc && vite build && vite build --ssr src/entry-server.tsx --outDir .ssr && node scripts/prerender.mjs",
+    "prebuild:spa": "npm run images",
+    "build:spa": "tsc && vite build",
+    "preview": "vite preview",
+    "clean": "rm -rf dist .ssr public/images/w src/generated *.tsbuildinfo",
+    "check:hydration": "node scripts/check-hydration.mjs"
+  },
+  "dependencies": {
+    "@fontsource/cormorant-garamond": "5.2.10",
+    "@fontsource/plus-jakarta-sans": "5.2.7",
+    "react": "19.2.4",
+    "react-dom": "19.2.4"
+  },
+  "devDependencies": {
+    "@types/node": "20.14.10",
+    "@types/react": "19.2.14",
+    "@types/react-dom": "19.2.3",
+    "@vitejs/plugin-react": "4.7.0",
+    "autoprefixer": "10.4.19",
+    "playwright": "1.63.0",
+    "postcss": "8.5.28",
+    "sharp": "0.34.4",
+    "tailwindcss": "3.4.17",
+    "typescript": "5.5.3",
+    "vite": "5.4.21"
+  }
+}

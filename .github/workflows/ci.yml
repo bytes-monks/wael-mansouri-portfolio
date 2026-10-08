@@ -1,0 +1,81 @@
+name: CI
+
+# Pull requests and pushes to any branch other than main. Pushes to main are
+# covered by deploy.yml, which runs the same build.
+on:
+  pull_request:
+  push:
+    branches-ignore: [main]
+
+permissions:
+  contents: read
+
+# A same-repo PR branch fires both `push` and `pull_request`; both of these
+# expressions resolve to the bare branch name, so the duplicate is cancelled.
+concurrency:
+  group: ci-${{ github.event.pull_request.head.ref || github.ref_name }}
+  cancel-in-progress: true
+
+jobs:
+  check:
+    name: Typecheck and build
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # Its own step so a type error is reported as one, before Vite starts.
+      - name: Typecheck
+        run: npm run typecheck
+
+      # The full production build, prerender included — it is cheap and is
+      # where the CNAME / SITE_URL and empty-render guards live.
+      - name: Build
+        run: npm run build
+        env:
+          BASE_URL: /
+
+  hydration:
+    name: Prerendered HTML hydrates and behaves
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v7
+
+      - name: Setup Node
+        uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      # The Chromium build that matches the pinned playwright devDependency,
+      # plus the system libraries it needs on a bare runner.
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Build
+        run: npm run build
+        env:
+          BASE_URL: /
+
+      # Loads the page twice — once with JS blocked, once normally — and fails
+      # if the server markup is incomplete, disagrees with the hydrated tree,
+      # or React logged a hydration complaint; then drives the gallery filter,
+      # lightbox, currency toggle and inquiry form (its POST goes to a mocked
+      # endpoint — CI must never send a real inquiry) and checks phone widths.
+      - name: Check hydration and behaviour
+        run: npm run check:hydration

@@ -1,0 +1,24 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { scroll-behavior: smooth; }
+  body { @apply bg-bone font-sans text-[15px] leading-relaxed text-onyx antialiased; }
+  h1, h2, h3 { @apply font-serif font-medium tracking-[-0.01em]; text-wrap: balance; }
+  :focus-visible { @apply outline outline-2 outline-offset-[3px] outline-terra; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    *, *::before, *::after { transition: none !important; animation: none !important; }
+  }
+}
+
+@layer components {
+  .wrap { @apply mx-auto w-full max-w-site px-4 sm:px-8 lg:px-14; }
+  .eyebrow { @apply text-[11px] font-medium uppercase tracking-label text-olive; }
+  .btn { @apply inline-flex cursor-pointer items-center gap-2 border border-onyx bg-onyx px-6 py-4 text-xs font-medium uppercase tracking-[0.16em] text-bone transition-colors hover:bg-transparent hover:text-onyx; }
+  .btn-ghost { @apply bg-transparent text-onyx hover:bg-onyx hover:text-bone; }
+  .btn-light { @apply border-bone bg-bone text-onyx hover:bg-transparent hover:text-bone; }
+  .field { @apply w-full min-w-0 normal-case tracking-normal rounded-none border-0 border-b border-sand bg-transparent px-0 py-2.5 text-[15px] text-onyx focus:border-onyx focus:outline-none focus:ring-0; }
+  .label { @apply grid gap-1.5 text-[11px] font-medium uppercase tracking-[0.14em] text-ink; }
+}
