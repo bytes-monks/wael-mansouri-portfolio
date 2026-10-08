@@ -6,7 +6,7 @@
 | Canonical URL | **https://waelmansouri.com** |
 | Also answers | `www.waelmansouri.com` (GitHub redirects it to the apex automatically) |
 | Redirects to it | `waelmansouri.bytesmonks.com` (see [`deploy/subdomain-redirect/`](deploy/subdomain-redirect/README.md)) |
-| Suggested repo | `bytes-monks/wael-mansouri-portfilio`, next to `bytes-monks/bytes-monks` and `bytes-monks/china-sourcing` |
+| Repository | `bytes-monks/wael-mansouri-portfolio`, next to `bytes-monks/bytes-monks` and `bytes-monks/china-sourcing` |
 
 ## 0. Register waelmansouri.com first
 
@@ -25,7 +25,7 @@ set up the redirect in step 4.
 git init -b main
 git add -A
 git commit -m "Wael Mansouri site: static Vite + React build for GitHub Pages"
-git remote add origin git@github.com:bytes-monks/wael-mansouri-portfilio.git
+git remote add origin git@github.com:bytes-monks/wael-mansouri-portfolio.git
 git push -u origin main
 ```
 
